@@ -25,6 +25,10 @@ class SpectralDataset(Dataset):
             y_labels = [y_labels]
         self.y_labels = y_labels
         
+        missing_labels = [label for label in self.y_labels if label not in data_raw.columns]
+        if missing_labels:
+            raise ValueError(f"Missing labels in the dataset: {', '.join(missing_labels)}")
+        
         # Extract target variables
         Y = np.array(data_raw.filter(regex="|".join(y_labels)))
         mask = ~np.isnan(Y).any(axis=1)

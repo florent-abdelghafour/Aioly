@@ -48,7 +48,7 @@ if __name__ == "__main__":
     
     user= os.environ.get('USERNAME')
     if user =='fabdelghafo':
-        data_path ="C:\\00_aioly\\sources_projects\\OSSL_project\\data\\datasets\\ossl\\ossl_all_L1_v1.2.csv"
+        data_path ="C:\\00_aioly\\GitHub\datasets\\ossl\\ossl_all_L1_v1.2.csv"
     else:
          data_path="/home/metz/deepchemometrics/Aioly/data/dataset/oss/ossl_all_L1_v1.2.csv"
          
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     
     
     if user=='fabdelghafo':
-        best_model_path='C:\\00_aioly\\sources_projects\OSSL_project\data\datasets\ossl\models\_ViT_1D_OSSL_\_ViT_1D_OSSL__epoch_3_final.pth'
+        best_model_path='C:\\00_aioly\\GitHub\datasets\\ossl\\ossl_all_L1_v1.2.csv\\models\\_ViT_1D_OSSL_\\_ViT_1D_OSSL__epoch_3_final.pth'
     else:
         best_model_path = os.path.dirname(data_path) + f'\\models\\{name_model}\\'+ name_model + '_best.pth'
     
