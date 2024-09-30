@@ -19,6 +19,8 @@ class data_augmentation:
         self.shift = shift
 
     def __call__(self, X):
-        X_aug = np.zeros_like(X)
-        X_aug = X * (1 + np.random.uniform(-self.slope, self.slope)) + np.random.uniform(-self.offset, self.offset) + np.random.normal(0, self.noise, len(X))
+        slope_factor = np.random.uniform(1 - self.slope, 1 + self.slope, X.shape)
+        offset_factor = np.random.uniform(-self.offset, self.offset, X.shape)
+        noise_factor = np.random.normal(0, self.noise, X.shape)
+        X_aug = X * slope_factor + offset_factor + noise_factor
         return X_aug

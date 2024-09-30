@@ -45,6 +45,7 @@ class EarlyStopping:
             
             
 ###############################################################################
+<<<<<<< Updated upstream
 def train(model, optimizer, criterion, train_loader, val_loader, num_epochs, save_path=None, save_interval=10,early_stop=True,classification = False,scheduler=None):
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)
@@ -52,6 +53,13 @@ def train(model, optimizer, criterion, train_loader, val_loader, num_epochs, sav
     if save_path:
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
     
+=======
+def train(model, optimizer, criterion, train_loader, val_loader, num_epochs, save_path=None, save_interval=10,early_stop=True,classification = False, plot_fig=True):
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+    
+        
+>>>>>>> Stashed changes
  
     early_stopping = EarlyStopping(save_path=save_path) if early_stop and save_path else None
     
@@ -74,7 +82,7 @@ def train(model, optimizer, criterion, train_loader, val_loader, num_epochs, sav
         for inputs, targets in train_loader:
             
             inputs = inputs.to(device,non_blocking=True).float()
-            targets = targets.to(device,non_blocking=True).float()
+            targets = targets.to(device).float() 
             optimizer.zero_grad()  # Zero the parameter gradients
             outputs = model(inputs[:,None])  # Forward pass
             loss = criterion(outputs, targets)  # Compute loss
@@ -116,18 +124,22 @@ def train(model, optimizer, criterion, train_loader, val_loader, num_epochs, sav
         all_targets = torch.cat(tar, dim=0)
         r2_scores = []
         f1_scores = []
+        
         if not classification:
-
             R2 = [torcheval.metrics.R2Score() for _ in range(model.out_dims)]
+<<<<<<< Updated upstream
 
             for i in range(model.out_dims):
                 R2[i].update(all_targets[:, i], all_outputs[:, i])
+=======
+            for i in range(model.out_dims):
+                R2[i].update(all_targets[:, i],all_outputs[:, i])
+>>>>>>> Stashed changes
                 r2_score = R2[i].compute().item()
                 r2_scores.append(r2_score)
-
+            
             val_r2_scores.append(r2_scores)
         else :
-
             F1 = torcheval.metrics.MulticlassF1Score()
             F1.update(torch.argmax(all_targets,dim=1), torch.argmax(all_outputs,dim=1))
             f1_scores = F1.compute()
@@ -170,51 +182,57 @@ def train(model, optimizer, criterion, train_loader, val_loader, num_epochs, sav
     train_losses_np = [loss.numpy() for loss in train_losses]
     val_losses_np = [loss.numpy() for loss in val_losses]
 
+    if plot_fig==True:
+        # Create figure and axes
+        fig, ax1 = plt.subplots(figsize=(12, 6))
+        
+        # Plotting Training and Validation Losses
+        ax1.set_xlabel('Epoch')
+        ax1.set_ylabel('Loss', color='tab:blue')
+        ax1.plot(train_losses_np, label='Training Loss', color='tab:blue')
+        ax1.plot(val_losses_np, label='Validation Loss', color='tab:orange')
+        ax1.tick_params(axis='y', labelcolor='tab:blue')
+        ax1.legend(loc='upper left')
 
-    # Create figure and axes
-    fig, ax1 = plt.subplots(figsize=(12, 6))
+        # Create another y-axis for R2 Scores
+        if not classification:
+            ax2 = ax1.twinx()
+            ax2.set_ylabel('R2 Score', color='tab:green')
 
-    # Plotting Training and Validation Losses
-    ax1.set_xlabel('Epoch')
-    ax1.set_ylabel('Loss', color='tab:blue')
-    ax1.plot(train_losses_np, label='Training Loss', color='tab:blue')
-    ax1.plot(val_losses_np, label='Validation Loss', color='tab:orange')
-    ax1.tick_params(axis='y', labelcolor='tab:blue')
-    ax1.legend(loc='upper left')
+            # Assuming val_r2_scores is a list of lists (one list per epoch)
+            for i in range(len(val_r2_scores[0])):  # Loop over each target dimension
+                r2_scores = [scores[i] for scores in val_r2_scores]
+                ax2.plot(r2_scores, label=f'R2 Score y{i}', linestyle='--')
 
-    # Create another y-axis for R2 Scores
-    if not classification:
-        ax2 = ax1.twinx()
-        ax2.set_ylabel('R2 Score', color='tab:green')
+            ax2.tick_params(axis='y', labelcolor='tab:green')
+            ax2.legend(loc='upper right')
 
-        # Assuming val_r2_scores is a list of lists (one list per epoch)
-        for i in range(len(val_r2_scores[0])):  # Loop over each target dimension
-            r2_scores = [scores[i] for scores in val_r2_scores]
-            ax2.plot(r2_scores, label=f'R2 Score y{i}', linestyle='--')
+        else :
+            ax2 = ax1.twinx()
+            ax2.set_ylabel('F1 Score', color='tab:green')
 
-        ax2.tick_params(axis='y', labelcolor='tab:green')
-        ax2.legend(loc='upper right')
-
-    else :
-        ax2 = ax1.twinx()
-        ax2.set_ylabel('F1 Score', color='tab:green')
-
-        # Assuming val_r2_scores is a list of lists (one list per epoch)
+            # Assuming val_r2_scores is a list of lists (one list per epoch)
 
 
-        ax2.plot(val_f1_scores, label=f'f1 Score ', linestyle='--')
+            ax2.plot(val_f1_scores, label=f'f1 Score ', linestyle='--')
 
-        ax2.tick_params(axis='y', labelcolor='tab:green')
-        ax2.legend(loc='upper right')
+            ax2.tick_params(axis='y', labelcolor='tab:green')
+            ax2.legend(loc='upper right')
 
-    # Set title and layout
-    plt.title('Training and Validation Metrics per Epoch')
-    fig.tight_layout()  # To prevent overlapping
+        # Set title and layout
+        plt.title('Training and Validation Metrics per Epoch')
+        fig.tight_layout()  # To prevent overlapping
 
+<<<<<<< Updated upstream
     # Show the plot
     plt.show(block=False)
 
 
+=======
+        # Show the plot
+        plt.show(block=False)    
+        # plt.close()
+>>>>>>> Stashed changes
 
     if save_path:
         return train_losses, val_losses, val_r2_scores , final_save_path
